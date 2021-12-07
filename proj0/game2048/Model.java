@@ -173,16 +173,19 @@ public class Model extends Observable {
                     currentRow -= 1;
                     continue;
                 }
+                // To prevent merges between tiles with a different tile between them Eg: |2|4|2|8| => |4|4|0|8|
+                if(t != null && t.value() != tCurrent.value()) {
+                    break;
+                }
                 if(t == null || t.value() == tCurrent.value()) {
                     boolean isMerge = board.move(col, row, tCurrent);
                     t = board.tile(col, row);
                     if(isMerge) {
                         score += board.tile(col, row).value();
                         hasChanged = true;
-                        break;
+                        break; // Break to prevent tile in next rows merging with resultant tile
                     }
                     hasChanged = true;
-
                 }
                 currentRow -= 1;
             }
