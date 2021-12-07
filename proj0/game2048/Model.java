@@ -145,11 +145,51 @@ public class Model extends Observable {
         // changed local variable to true.
 
         checkGameOver();
+        //Set view perspective to side
+        if(!side.equals(Side.NORTH)) {
+            board.setViewingPerspective(side);
+        }
+        for(int col = 0; col < board.size(); col++) {
+            boolean hasChanged = tiltColumn(col);
+            if(hasChanged) changed = true;
+        }
+        if(!side.equals(Side.NORTH)) {
+            board.setViewingPerspective(Side.NORTH);
+        }
         if (changed) {
             setChanged();
         }
         return changed;
     }
+
+    public boolean tiltColumn(int col) {
+        boolean hasChanged = false;
+        for(int row =board.size() - 1; row > 0; row--) {
+            Tile t = board.tile(col, row);
+            int currentRow = row - 1;
+            while(currentRow >= 0) {
+                Tile tCurrent = board.tile(col, currentRow);
+                if(tCurrent == null) {
+                    currentRow -= 1;
+                    continue;
+                }
+                if(t == null || t.value() == tCurrent.value()) {
+                    boolean isMerge = board.move(col, row, tCurrent);
+                    t = board.tile(col, row);
+                    if(isMerge) {
+                        score += board.tile(col, row).value();
+                        hasChanged = true;
+                        break;
+                    }
+                    hasChanged = true;
+
+                }
+                currentRow -= 1;
+            }
+        }
+        return hasChanged;
+    }
+
 
     /**
      * Checks if the game is over and sets the gameOver variable
